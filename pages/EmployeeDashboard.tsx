@@ -1,7 +1,9 @@
 import React from 'react';
-import { User, Quest, Course } from '../types';
+import { User, Course } from '../types';
 import { Trophy, Target, ArrowRight, PlayCircle, Flame, Users } from 'lucide-react';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { useNavigate, Link } from 'react-router-dom';
+import { useLanguage } from '../LanguageContext';
 
 interface EmployeeDashboardProps {
   user: User;
@@ -9,6 +11,8 @@ interface EmployeeDashboardProps {
 }
 
 const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user, courses }) => {
+  const navigate = useNavigate();
+  const { t } = useLanguage();
   const radarData = user.skills.map(skill => ({
     subject: skill.name,
     A: skill.level,
@@ -25,13 +29,13 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user, courses }) 
           <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-10 -mt-10 blur-3xl"></div>
           
           <div className="relative z-10">
-            <h1 className="text-3xl font-bold mb-2">Welcome back, {user.name.split(' ')[0]}!</h1>
-            <p className="text-indigo-100 mb-6">You are crushing your goals this week. Keep up the momentum!</p>
+            <h1 className="text-3xl font-bold mb-2">{t('dashboard.welcome')}, {user.name.split(' ')[0]}!</h1>
+            <p className="text-indigo-100 mb-6">{t('dashboard.tempo')}</p>
             
             <div className="flex items-center gap-8">
               <div>
                 <div className="text-4xl font-bold mb-1">{user.level}</div>
-                <div className="text-xs text-indigo-200 uppercase tracking-wide">Current Level</div>
+                <div className="text-xs text-indigo-200 uppercase tracking-wide">{t('dashboard.current_level')}</div>
               </div>
               <div className="flex-1 max-w-sm">
                 <div className="flex justify-between text-xs font-semibold mb-2">
@@ -45,15 +49,15 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user, courses }) 
                   ></div>
                 </div>
                 <div className="mt-2 text-xs text-indigo-200">
-                    {user.nextLevelXP - user.currentXP} XP to Level {user.level + 1}
+                    {user.nextLevelXP - user.currentXP} XP {t('dashboard.xp_to_next')} {user.level + 1}
                 </div>
               </div>
               <div className="hidden sm:block">
                  <div className="bg-white/10 p-3 rounded-lg backdrop-blur-md flex items-center gap-3">
                     <Flame className="text-orange-400" size={24} fill="currentColor" />
                     <div>
-                        <div className="font-bold">5 Day</div>
-                        <div className="text-xs text-indigo-200">Streak</div>
+                        <div className="font-bold">5 {t('dashboard.days')}</div>
+                        <div className="text-xs text-indigo-200">{t('dashboard.streak')}</div>
                     </div>
                  </div>
               </div>
@@ -66,21 +70,24 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user, courses }) 
             <div>
                 <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
                     <Trophy className="text-amber-500" size={20} /> 
-                    Badges & Kudos
+                    {t('dashboard.badges_kudos')}
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="bg-amber-50 rounded-xl p-4 flex flex-col items-center justify-center text-center">
                         <div className="text-3xl font-bold text-amber-600 mb-1">{user.kudos}</div>
-                        <div className="text-xs text-amber-800 font-medium">Kudos Received</div>
+                        <div className="text-xs text-amber-800 font-medium">{t('dashboard.earned_kudos')}</div>
                     </div>
                     <div className="bg-indigo-50 rounded-xl p-4 flex flex-col items-center justify-center text-center">
                         <div className="text-3xl font-bold text-indigo-600 mb-1">8</div>
-                        <div className="text-xs text-indigo-800 font-medium">Badges Earned</div>
+                        <div className="text-xs text-indigo-800 font-medium">{t('dashboard.badges')}</div>
                     </div>
                 </div>
             </div>
-            <button className="w-full mt-4 py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-medium hover:border-indigo-400 hover:text-indigo-600 transition-colors">
-                View Trophy Case
+            <button 
+                onClick={() => navigate('/leaderboard')}
+                className="w-full mt-4 py-3 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 font-medium hover:border-indigo-400 hover:text-indigo-600 transition-colors"
+            >
+                {t('dashboard.view_hall_of_fame')}
             </button>
         </div>
       </div>
@@ -94,12 +101,16 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user, courses }) 
             {/* Active Quests */}
             <section>
                 <div className="flex justify-between items-end mb-4">
-                    <h2 className="text-xl font-bold text-slate-800">Active Quests</h2>
-                    <a href="#" className="text-sm text-indigo-600 font-medium hover:underline">View All</a>
+                    <h2 className="text-xl font-bold text-slate-800">{t('dashboard.active_quests')}</h2>
+                    <Link to="/quests" className="text-sm text-indigo-600 font-medium hover:underline">{t('dashboard.view_all')}</Link>
                 </div>
                 <div className="grid gap-4">
-                    {user.quests.map((quest) => (
-                        <div key={quest.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 transition-transform hover:-translate-y-1 hover:shadow-md cursor-pointer">
+                    {user.quests.slice(0, 3).map((quest) => (
+                        <div 
+                            key={quest.id} 
+                            onClick={() => navigate('/quests')}
+                            className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 transition-transform hover:-translate-y-1 hover:shadow-md cursor-pointer"
+                        >
                             <div className={`p-3 rounded-full ${quest.status === 'completed' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'}`}>
                                 <Target size={24} />
                             </div>
@@ -115,7 +126,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user, courses }) 
                             </div>
                             <div className="text-right">
                                 <div className="text-sm font-bold text-slate-800">+{quest.xpReward} XP</div>
-                                <div className="text-xs text-slate-400">{quest.progress}% Done</div>
+                                <div className="text-xs text-slate-400">{quest.progress}% {t('dashboard.done')}</div>
                             </div>
                         </div>
                     ))}
@@ -125,16 +136,16 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user, courses }) 
             {/* Recommended Learning */}
              <section>
                 <div className="flex justify-between items-end mb-4">
-                    <h2 className="text-xl font-bold text-slate-800">Recommended For You</h2>
-                    <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded">Based on skill gaps</span>
+                    <h2 className="text-xl font-bold text-slate-800">{t('dashboard.recommended')}</h2>
+                    <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded">{t('dashboard.based_on_gaps')}</span>
                 </div>
                 <div className="grid md:grid-cols-2 gap-4">
-                    {courses.map(course => (
+                    {courses.slice(0, 2).map(course => (
                         <div key={course.id} className="group bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow">
                             <div className="h-32 bg-slate-200 relative">
-                                <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" referrerPolicy="no-referrer" />
                                 <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
-                                    {course.matchScore}% Match
+                                    {course.matchScore}% {t('dashboard.match')}
                                 </div>
                             </div>
                             <div className="p-4">
@@ -147,8 +158,11 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user, courses }) 
                                 </div>
                                 <h4 className="font-bold text-slate-800 leading-tight mb-1">{course.title}</h4>
                                 <div className="text-xs text-slate-500 mb-4">{course.provider} • {course.duration}</div>
-                                <button className="w-full py-2 bg-slate-50 text-slate-700 text-sm font-medium rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors flex items-center justify-center gap-2">
-                                    <PlayCircle size={16} /> Start Learning
+                                <button 
+                                    onClick={() => navigate('/learning')}
+                                    className="w-full py-2 bg-slate-50 text-slate-700 text-sm font-medium rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <PlayCircle size={16} /> {t('dashboard.start_learning')}
                                 </button>
                             </div>
                         </div>
@@ -160,7 +174,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user, courses }) 
         {/* Right Column: Skills Visualization */}
         <div className="space-y-8">
             <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <h3 className="font-bold text-slate-800 mb-6">Skill Profile</h3>
+                <h3 className="font-bold text-slate-800 mb-6">{t('dashboard.skill_profile')}</h3>
                 <div className="h-64 -ml-6">
                     <ResponsiveContainer width="100%" height="100%">
                         <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
@@ -180,11 +194,14 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user, courses }) 
                 </div>
                 <div className="mt-4 text-center">
                     <p className="text-sm text-slate-500">
-                        You're strong in <span className="font-semibold text-indigo-600">Hard Skills</span>. 
-                        Try focusing on Leadership to balance your profile.
+                        {t('dashboard.strong_in')} <span className="font-semibold text-indigo-600">{t('dashboard.hard_skills')}</span>. 
+                        {t('dashboard.focus_on_leadership')}
                     </p>
-                    <button className="mt-4 text-indigo-600 text-sm font-medium flex items-center justify-center gap-1 w-full hover:underline">
-                        View Detailed Matrix <ArrowRight size={14} />
+                    <button 
+                        onClick={() => navigate('/skills')}
+                        className="mt-4 text-indigo-600 text-sm font-medium flex items-center justify-center gap-1 w-full hover:underline"
+                    >
+                        {t('dashboard.view_matrix')} <ArrowRight size={14} />
                     </button>
                 </div>
             </div>
@@ -194,15 +211,18 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user, courses }) 
                     <Users size={24} className="text-indigo-300" />
                 </div>
                 <h3 className="font-bold text-lg mb-2">Social Club</h3>
-                <p className="text-indigo-200 text-sm mb-6">Connect with peers, find mentors, or become one!</p>
+                <p className="text-indigo-200 text-sm mb-6">{t('dashboard.social_club_desc')}</p>
                 <div className="flex -space-x-2 justify-center mb-6">
-                    <img className="w-8 h-8 rounded-full border-2 border-slate-900" src="https://picsum.photos/200?random=20" alt="" />
-                    <img className="w-8 h-8 rounded-full border-2 border-slate-900" src="https://picsum.photos/200?random=21" alt="" />
-                    <img className="w-8 h-8 rounded-full border-2 border-slate-900" src="https://picsum.photos/200?random=22" alt="" />
+                    <img className="w-8 h-8 rounded-full border-2 border-slate-900" src="https://picsum.photos/200?random=20" alt="" referrerPolicy="no-referrer" />
+                    <img className="w-8 h-8 rounded-full border-2 border-slate-900" src="https://picsum.photos/200?random=21" alt="" referrerPolicy="no-referrer" />
+                    <img className="w-8 h-8 rounded-full border-2 border-slate-900" src="https://picsum.photos/200?random=22" alt="" referrerPolicy="no-referrer" />
                     <div className="w-8 h-8 rounded-full border-2 border-slate-900 bg-indigo-600 flex items-center justify-center text-xs font-bold">+42</div>
                 </div>
-                <button className="bg-white text-indigo-900 w-full py-2 rounded-lg font-semibold text-sm hover:bg-indigo-50 transition-colors">
-                    Join Discussion
+                <button 
+                    onClick={() => navigate('/social-club')}
+                    className="bg-white text-indigo-900 w-full py-2 rounded-lg font-semibold text-sm hover:bg-indigo-50 transition-colors"
+                >
+                    {t('dashboard.join_discussion')}
                 </button>
              </div>
         </div>

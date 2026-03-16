@@ -1,13 +1,15 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Zap, Users, Shield, BookOpen, Settings } from 'lucide-react';
+import { LayoutDashboard, Zap, Users, Shield, BookOpen, Settings, Trophy, Target } from 'lucide-react';
 import { UserRole } from '../types';
+import { useLanguage } from '../LanguageContext';
 
 interface SidebarProps {
   role: UserRole;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ role }) => {
+  const { t } = useLanguage();
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
       isActive
@@ -24,27 +26,39 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
         <span className="text-xl font-bold text-slate-800 tracking-tight">SkillVerse</span>
       </div>
 
-      <nav className="flex-1 px-4 space-y-2 mt-4">
+      <nav className="flex-1 px-4 space-y-2 mt-4 overflow-y-auto">
         {role === UserRole.EMPLOYEE && (
           <>
             <div className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-2">
-              My Journey
+              {t('nav.dashboard')}
             </div>
             <NavLink to="/" className={linkClass}>
               <LayoutDashboard size={20} />
-              <span>Dashboard</span>
+              <span>{t('nav.dashboard')}</span>
             </NavLink>
             <NavLink to="/skills" className={linkClass}>
               <Zap size={20} />
-              <span>My Skills</span>
-            </NavLink>
-            <NavLink to="/social-club" className={linkClass}>
-              <Users size={20} />
-              <span>Social Club</span>
+              <span>{t('nav.skills')}</span>
             </NavLink>
             <NavLink to="/learning" className={linkClass}>
               <BookOpen size={20} />
-              <span>Learning Path</span>
+              <span>{t('nav.learning')}</span>
+            </NavLink>
+            
+            <div className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 mt-6">
+              {t('nav.social')}
+            </div>
+             <NavLink to="/quests" className={linkClass}>
+              <Target size={20} />
+              <span>{t('nav.quests')}</span>
+            </NavLink>
+            <NavLink to="/social-club" className={linkClass}>
+              <Users size={20} />
+              <span>{t('nav.social')}</span>
+            </NavLink>
+            <NavLink to="/leaderboard" className={linkClass}>
+              <Trophy size={20} />
+              <span>{t('nav.leaderboard')}</span>
             </NavLink>
           </>
         )}
@@ -56,11 +70,11 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
             </div>
             <NavLink to="/manager" className={linkClass}>
               <LayoutDashboard size={20} />
-              <span>Team Overview</span>
+              <span>{t('nav.manager')}</span>
             </NavLink>
             <NavLink to="/approvals" className={linkClass}>
               <Shield size={20} />
-              <span>Approvals</span>
+              <span>{t('nav.approvals')}</span>
             </NavLink>
           </>
         )}
@@ -69,7 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role }) => {
       <div className="p-4 border-t border-slate-100">
         <button className="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-indigo-600 w-full rounded-lg transition-colors">
           <Settings size={20} />
-          <span>Settings</span>
+          <span>Nastavení</span>
         </button>
       </div>
     </div>
